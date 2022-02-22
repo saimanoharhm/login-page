@@ -1,26 +1,40 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { Route, Routes, useNavigate } from 'react-router-dom';
+import AuthPage from './pages/AuthPage';
+import Layout from './components/Layout/Layout';
+import StartingPage from './components/Main/StartingPage';
+import { useState, useEffect } from 'react';
 
-function App() {
+const App: React.FC = () => {
+  const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  useEffect(() => {
+    const storedUserLoggedInInformation = localStorage.getItem('auth');
+    if (storedUserLoggedInInformation === '1') {
+      setIsLoggedIn(true);
+    }
+  }, []);
+
+  const loginHandler = (): void => {
+    setIsLoggedIn(true);
+  };
+
+  const logoutHandler = () => {
+    localStorage.removeItem('auth');
+    setIsLoggedIn(false);
+    navigate('/');
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Layout isAuthenticated={isLoggedIn} onLogout={logoutHandler}>
+      <Routes>
+        <Route
+          path="/"
+          element={<AuthPage onLogin={loginHandler} isLoggedIn={isLoggedIn} />}
+        />
+        <Route path="/home" element={<StartingPage />} />
+      </Routes>
+    </Layout>
   );
-}
+};
 
 export default App;
